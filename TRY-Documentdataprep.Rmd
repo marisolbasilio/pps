@@ -1,0 +1,156 @@
+---
+title: "dataprep"
+output: html_document
+---
+
+## First step is to prepare the environment
+
+Install packages and load necessary libraries. For this data preparation I'm using stata code
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+
+library(tinytex)
+library(renv)
+library(papaja)
+library(worcs)
+library(knitr)
+library(papaja)
+library(tinytex)
+library(magrittr)
+library(kableExtra)
+library(ggplot2)
+library(here)
+library(dplyr)
+library(readxl)
+library(Statamarkdown)
+library(magrittr)
+
+stataexe <- find_stata()
+
+```
+
+## Set up the STATA environment and working directory
+
+Because all code chunks run separately, I need to either copy the folder directory in each chunk, or find a way to carry information from one chunk to the other.
+
+```{stata}
+
+*******************
+** GENERAL SETUP **
+*******************
+clear 
+clear mata
+clear matrix
+set more off
+version 16.0
+set maxvar 7000
+
+*Working directory:
+
+cd "/Users/mb773/Documents/MBS Work/PPS/Paper 1/"
+
+
+```
+
+## Save original databases for cleaning
+
+Save a copy of the latest database for modification with another name whithin the Work Space Directory. I went through all the datasets in Jan 2019, there is a Doc log called "2019 January PPS Databases LOG"
+
+First, the 4 and 14m data:
+
+```{stata}
+cd "/Users/mb773/Documents/MBS Work/PPS/Paper 1/"
+use "data/2019-02 PPS 4m and 14m complete dataset with all segments and derived variables 3 .dta"
+save "data/2020-10-27 PPS 4m and 14m Original.dta", replace
+```
+
+Then the 24m data:
+
+```{stata}
+cd "/Users/mb773/Documents/MBS Work/PPS/Paper 1/"
+use "/Users/mb773/Dropbox/MBS Work/Parental Playfulness Scale/PPS 24m data cleaning/24m PPS Clean 3 - with DV step 5.dta"
+save "data/2020-10-27 PPS 24m Original.dta", replace
+
+```
+
+```{stata}
+
+*Working directory:
+
+cd "/Users/mb773/Documents/MBS Work/PPS/Paper 1/"
+
+** Open the newly created database and save with a changed name for this particular task
+
+use "data/2020-10-27 PPS 4m and 14m Original.dta"
+
+save "data/2020-10-27 PPS 4-14m Clean Global.dta", replace
+
+rename (D4_Global_Play_Sc D14_Global_Play_1 D14_Global_Play_2 D14_Global_Play_Sc_3 D14_Global_Play_Sc_4 D14_Global_Play_Sc D14_Global_Play_Sc_FP_T) (D4 D14_DT1 D14_DT2 D14_FP3 D14_FP4 D14 D14_FP)
+
+rename (M4_Global_Play_Sc M14_Global_Play_1 M14_Global_Play_2 M14_Global_Play_Sc_3 M14_Global_Play_Sc_4 M14_Global_Play_Sc M14_Global_Play_Sc_FP_T) (M4 M14_DT1 M14_DT2 M14_FP3 M14_FP4 M14 M14_FP)
+
+** Relabel variables
+
+*4m
+label variable D4 "Dad 4 Global Play Scale"
+label variable M4 "Mum 4 Global Play Scale"
+
+*14 Total
+label variable D14 "Dad 14 Global Play Scale"
+label variable M14 "Mum 14 Global Play Scale"
+
+*14m Dont Touch
+
+label variable D14_DT1 "Dad 14 Global Play Scale in Don't Touch Segment 1"
+label variable M14_DT1 "Mum 14 Global Play Scale in Don't Touch Segment 1"
+label variable D14_DT2 "Dad 14 Global Play Scale in Don't Touch Segment 2"
+label variable M14_DT2 "Mum 14 Global Play Scale in Don't Touch Segment 2"
+
+*14m Free Play
+label variable D14_FP3 "Dad 14 Global Play Scale in Free Play Segment 3"
+label variable M14_FP3 "Mum 14 Global Play Scale in Free Play Segment 3"
+label variable D14_FP4 "Dad 14 Global Play Scale in Free Play Segment 4"
+label variable M14_FP4 "Mum 14 Global Play Scale in Free Play Segment 4"
+
+
+** Generate variables for  Total DT
+gen D14_DT = (D14_DT1+ D14_DT2)/2
+gen M14_DT = (M14_DT1+ M14_DT2)/2
+
+label variable D14_DT "Dad 14 Global Play Scale in Don't Touch Total"
+label variable M14_DT "Mum 14 Global Play Scale in Don't Touch Total"
+
+label variable D14_FP "Dad 14 Global Play Scale in Free Play Total"
+label variable M14_FP "Mum 14 Global Play Scale in Free Play Total"
+
+*** Define values labels
+
+label define GlobalPPS ///
+	1 "Not playful at all" ///
+	2 "Very rarely playful" ///
+	3 "Rarely playful" ///
+	4 "Somewhat playful" ///
+	5 "Fairly playful" ///
+	6 "Moderately playful" ///
+	7 "Playful" ///
+	8 "Very playful" ///
+	9 "Highly playful"
+
+** Add label values
+
+label values D4 D14_DT1 D14_DT2 D14_FP3 D14_FP4 GlobalPPS
+
+label values M4 M14_DT1 M14_DT2 M14_FP3 M14_FP4 GlobalPPS	
+
+```
+
+
+
+
+
+
+
+
+
+

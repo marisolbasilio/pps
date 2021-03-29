@@ -1,0 +1,119 @@
+---
+title: "PPS Results"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+
+library(Statamarkdown)
+library(tinytex)
+library(renv)
+library(papaja)
+library(worcs)
+library(knitr)
+library(papaja)
+library(tinytex)
+library(magrittr)
+library(kableExtra)
+library(ggplot2)
+library(here)
+library(dplyr)
+library(readxl)
+
+stataexe <- find_stata()
+
+```
+
+
+```{stata}
+clear 
+clear mata
+clear matrix
+set more off
+version 16.0
+set maxvar 7000
+
+
+*working directory:
+
+cd "/Users/mb773/Documents/MBS Work/PPS/Paper 1/"
+
+use "data/wide-incParent.dta"
+
+tabstat			///
+play411			///
+play412			///
+play1411		///
+play1421		///
+play1431		///
+play1441		///
+play1412		///
+play1422		///
+play1432		///
+play1442		///
+play2411		///
+play2421		///
+play2431		///
+play2441		///
+play2412		///
+play2422		///
+play2432		///
+play2442		///
+, stat(n mean sd min max) save
+
+
+return list
+matlist r(StatTotal)
+
+matrix results = r(StatTotal)'
+matlist results
+
+putexcel set descriptives.xlsx, sheet(1) replace
+
+putexcel A1 = matrix(results), names nformat(number_d2)
+
+putexcel set descriptives.xlsx, sheet(1) modify
+putexcel B2:B19, nformat(number) overwritefmt
+
+putexcel	A2	= "Mum 4m Lap Play"
+putexcel	A3	= "Dad 4m Lap Play"
+putexcel	A4	= "Mum 14m Don’t Touch 1"
+putexcel	A5	= "Mum 14m Don’t Touch 2"
+putexcel	A6	= "Mum 14m Free Play 1"
+putexcel	A7	= "Mum 14m Free Play 2"
+putexcel	A8	= "Dad 14m Don’t Touch 1"
+putexcel	A9	= "Dad 14m Don’t Touch 2"
+putexcel	A10	= "Dad 14m Free Play 1"
+putexcel	A11	= "Dad 14m Free Play 2"
+putexcel	A12	= "Mum 24m Don’t Touch 1"
+putexcel	A13	= "Mum 24m Don’t Touch 2"
+putexcel	A14	= "Mum 24m Free Play 1"
+putexcel	A15	= "Mum 24m Free Play 2"
+putexcel	A16	= "Dad 24m Don’t Touch 1"
+putexcel	A17	= "Dad 24m Don’t Touch 2"
+putexcel	A18	= "Dad 24m Free Play 1"
+putexcel	A19	= "Dad 24m Free Play 2"
+
+```
+
+```{r}
+read_excel("descriptives.xlsx")
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

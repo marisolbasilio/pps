@@ -4,3 +4,17 @@
 # to store the data.
 
 library(worcs)
+
+library(tinytex)
+library(renv)
+library(papaja)
+library(worcs)
+library(knitr)
+library(papaja)
+library(tinytex)
+library(magrittr)
+library(kableExtra)
+library(ggplot2)
+library(here)
+library(dplyr)
+library(readxl)
