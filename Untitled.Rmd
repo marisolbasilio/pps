@@ -1,13 +1,12 @@
 ---
 title: "PPS Results"
 output: html_document
+
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 
-
-library(Statamarkdown)
 library(tinytex)
 library(renv)
 library(papaja)
@@ -21,87 +20,125 @@ library(ggplot2)
 library(here)
 library(dplyr)
 library(readxl)
-
-stataexe <- find_stata()
-
+library(tibble)
+opts_chunk$set(tidy.opts=list(width.cutoff=60),tidy=TRUE)
 ```
 
+```{r, echo=FALSE, message=FALSE}
+library(Statamarkdown)
+stataexe <- find_stata()
+```
 
-```{stata}
-clear 
+```{stata, echo=FALSE, cleanlog=FALSE, results="hide"}
+clear
 clear mata
 clear matrix
 set more off
 version 16.0
 set maxvar 7000
-
-
 *working directory:
 
 cd "/Users/mb773/Documents/MBS Work/PPS/Paper 1/"
+do "prog/1 Descriptives.do"
+do "prog/1 RQ.do"
 
-use "data/wide-incParent.dta"
+```
 
-tabstat			///
-play411			///
-play412			///
-play1411		///
-play1421		///
-play1431		///
-play1441		///
-play1412		///
-play1422		///
-play1432		///
-play1442		///
-play2411		///
-play2421		///
-play2431		///
-play2441		///
-play2412		///
-play2422		///
-play2432		///
-play2442		///
-, stat(n mean sd min max) save
+# Descriptives
+
+```{r, echo=FALSE, message=FALSE}
+# Add path of file 
+xl_tables <- "/Users/mb773/Documents/MBS Work/PPS/Paper 1/output/tables.xlsx"
+
+# Before reading data, we will return the names of the sheets for later use:
+# excel_sheets(path = xl_tables)
+# "desc"      "corr"      "retest"    "spearman"  "spearman2"
+
+# Creating R data frames with each sheet
+df_desc <- read_excel(path = xl_tables, sheet = "desc")
+df_corr <- read_excel(path = xl_tables, sheet = "corr")
+df_retest <- read_excel(path = xl_tables, sheet = "retest")
+df_spearman <- read_excel(path = xl_tables, sheet = "spearman")
+df_spearman2 <- read_excel(path = xl_tables, sheet = "spearman2")
+
+# Creating tables
+df_desc %>%
+  kbl(caption = "Table 1. Descriptive Statistics", digits = 2) %>%
+  kable_classic(full_width = F, html_font = "Times")
+
+```
+```
+
+# Correlations
+
+![4m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/mygraph.png)
+
+```{stata, echo=FALSE, cleanlog=FALSE, results="hide"}
+cd "/Users/mb773/Documents/MBS Work/PPS/Paper 1/"
+use "data/wide.dta"
+
+histogram play141, discrete width(1) frequency fcolor(gs12) lcolor(white) addlabel binrescale scheme(s2mono) by(parent, xrescale) subtitle(, nobox)
+graph save "Graph" "graph/141play.gph", replace
+graph export 141play.png
+```
+![14m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/141play.png)
+
+```{stata, echo=FALSE, cleanlog=FALSE, results="hide"}
+cd "/Users/mb773/Documents/MBS Work/PPS/Paper 1/"
+use "data/wide.dta"
+
+histogram play142, discrete width(1) frequency fcolor(gs12) lcolor(white) addlabel binrescale scheme(s2mono) by(parent, xrescale) subtitle(, nobox)
+graph save "Graph" "graph/142play.gph", replace
+graph export 142play.png
+
+```
+
+![14m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/142play.png)
 
 
-return list
-matlist r(StatTotal)
-
-matrix results = r(StatTotal)'
-matlist results
-
-putexcel set descriptives.xlsx, sheet(1) replace
-
-putexcel A1 = matrix(results), names nformat(number_d2)
-
-putexcel set descriptives.xlsx, sheet(1) modify
-putexcel B2:B19, nformat(number) overwritefmt
-
-putexcel	A2	= "Mum 4m Lap Play"
-putexcel	A3	= "Dad 4m Lap Play"
-putexcel	A4	= "Mum 14m Don’t Touch 1"
-putexcel	A5	= "Mum 14m Don’t Touch 2"
-putexcel	A6	= "Mum 14m Free Play 1"
-putexcel	A7	= "Mum 14m Free Play 2"
-putexcel	A8	= "Dad 14m Don’t Touch 1"
-putexcel	A9	= "Dad 14m Don’t Touch 2"
-putexcel	A10	= "Dad 14m Free Play 1"
-putexcel	A11	= "Dad 14m Free Play 2"
-putexcel	A12	= "Mum 24m Don’t Touch 1"
-putexcel	A13	= "Mum 24m Don’t Touch 2"
-putexcel	A14	= "Mum 24m Free Play 1"
-putexcel	A15	= "Mum 24m Free Play 2"
-putexcel	A16	= "Dad 24m Don’t Touch 1"
-putexcel	A17	= "Dad 24m Don’t Touch 2"
-putexcel	A18	= "Dad 24m Free Play 1"
-putexcel	A19	= "Dad 24m Free Play 2"
-
+```{r}
+df_desc_name %>%
+  kbl(caption = "Table 1. Descriptive Statistics", digits = 2) %>%
+  kable_classic(full_width = F, html_font = "Times")
 ```
 
 ```{r}
-read_excel("descriptives.xlsx")
-
+df_corr %>%
+  kbl(caption = "Table 1. Descriptive Statistics", digits = 2) %>%
+  kable_classic(full_width = F, html_font = "Times")
 ```
+
+
+
+
+```{r}
+kbl(df_desc) %>%
+  kable_classic(full_width = F, html_font = "Times") %>%
+  add_header_above(c(" " = 1, "Group 1" = 2, "Group 2" = 2))
+```
+
+```{r}
+play <- "play41 play141 play142 play143 play144 play241 play242 play243 play244"
+```
+
+
+
+![4m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/graph/play41.png)
+![14m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/graph/play141.png)
+![14m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/graph/play142.png)
+
+
+![14m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/graph/play143.png)
+
+![14m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/graph/play144.png)
+
+![24m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/graph/play241.png)
+
+![24m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/graph/play242.png)
+
+![24m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/graph/play243.png)
+
+![24m Playfulness](/Users/mb773/Documents/MBS Work/PPS/Paper 1/graph/play244.png)
 
 
 

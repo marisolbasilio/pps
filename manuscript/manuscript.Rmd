@@ -1,27 +1,33 @@
 ---
-title             : "The title"
-shorttitle        : "Title"
+title             : "How playful are parents with their infants?"
+shorttitle        : "Parental Playfulness Scale"
 
 author: 
-  - name          : "First Author"
+  - name          : "Marisol Basilio"
     affiliation   : "1"
     corresponding : yes    # Define only one corresponding author
     address       : "Postal address"
-    email         : "my@email.com"
+    email         : "mb773@cam.ac.uk"
     role:         # Contributorship roles (e.g., CRediT, https://casrai.org/credit/)
       - Conceptualization
       - Writing - Original Draft Preparation
       - Writing - Review & Editing
-  - name          : "Ernst-August Doelle"
-    affiliation   : "1,2"
+  - name          : "Ciara Laverty"
+    affiliation   : "2"
     role:
       - Writing - Review & Editing
 
+  - name          : "Claire Hughes"
+    affiliation   : "3"
+    role:
+      - Writing - Review & Editing
 affiliation:
   - id            : "1"
-    institution   : "Wilhelm-Wundt-University"
+    institution   : "PEDAL, University of Cambridge"
   - id            : "2"
-    institution   : "Konstanz Business School"
+    institution   : "The LEGO Foundation"
+  - id            : "3"
+    institution   : "Centre for Family Research, University of Cambridge"
 
 authornote: |
   Add complete departmental affiliations for each author here. Each new line herein must be indented, like this line.
@@ -67,31 +73,103 @@ knit              : worcs::cite_all
 ```{r setup, include = FALSE}
 library("papaja")
 library("worcs")
+library(readxl)
+library(here)
+library(dplyr)
+library(kableExtra)
+library(magrittr)
 # We recommend that you prepare your raw data for analysis in 'prepare_data.R',
 # and end that file with either open_data(yourdata), or closed_data(yourdata).
 # Then, uncomment the line below to load the original or synthetic data
 # (whichever is available), to allow anyone to reproduce your code:
 # load_data()
 r_refs("r-references.bib")
+options(tinytex.verbose = TRUE)
 ```
+
+```{r, echo=FALSE, message=FALSE}
+library(Statamarkdown)
+stataexe <- find_stata()
+```
+
 
 This manuscript uses the Workflow for Open Reproducible Code in Science [WORCS version 0.1.8, @vanlissaWORCSWorkflowOpen2020] to ensure reproducibility and transparency. All code <!--and data--> are available at <https://github.com/marisolbasilio/pps.git>.
 
-This is an example of a non-essential citation [@@vanlissaWORCSWorkflowOpen2020]. If you change the rendering function to `worcs::cite_essential`, it will be removed.
+This is an example of a non-essential citation [@vanlissaWORCSWorkflowOpen2020]. If you change the rendering function to `worcs::cite_essential`, it will be removed.
 
 <!--The function below inserts a notification if the manuscript is knit using synthetic data. Make sure to insert it after load_data().-->
 `r notify_synthetic()`
 
-```{r analysis-preferences}
+```{r, echo=FALSE, message=FALSE}
 # Seed for random number generation
-set.seed(42)
-knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+#set.seed(42)
+#knitr::opts_chunk$set(cache.extra = knitr::rand_seed)
+```
+
+# Methods
+We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the study. <!-- 21-word solution (Simmons, Nelson & Simonsohn, 2012; retrieved from http://ssrn.com/abstract=2160588) -->
+
+```{stata, echo=FALSE, cleanlog=FALSE, results="hide"}
+clear
+clear mata
+clear matrix
+set more off
+version 16.0
+set maxvar 7000
+*working directory:
+cd "/Users/mb773/Documents/MBS Work/PPS/Paper 1/"
+do "prog/1 Descriptives.do"
+do "prog/1 RQ.do"
+```
+
+## Descriptives
+```{r, echo=FALSE, message=FALSE}
+# Add path of file 
+xl_tables <- "/Users/mb773/Documents/MBS Work/PPS/Paper 1/output/tables.xlsx"
+
+# Before reading data, we will return the names of the sheets for later use:
+# excel_sheets(path = xl_tables)
+# "desc"      "corr"      "retest"    "spearman"  "spearman2"
+
+# Creating R data frames with each sheet
+df_desc <- read_excel(path = xl_tables, sheet = "desc")
+df_corr <- read_excel(path = xl_tables, sheet = "corr")
+df_retest <- read_excel(path = xl_tables, sheet = "retest")
+df_spearman <- read_excel(path = xl_tables, sheet = "spearman")
+df_spearman2 <- read_excel(path = xl_tables, sheet = "spearman2")
+
+# Creating tables
+df_desc %>%
+  kbl(caption = "Table 1. Descriptive Statistics", digits = 2) %>%
+  kable_classic(full_width = F, html_font = "Times")
+```
+
+```{r, echo=FALSE, message=FALSE}
+# Creating tables
+df_corr %>%
+  kbl(caption = "Table 2. Correlations", digits = 2) %>%
+  kable_classic(full_width = T, html_font = "Times")
 ```
 
 
 
-# Methods
-We report how we determined our sample size, all data exclusions (if any), all manipulations, and all measures in the study. <!-- 21-word solution (Simmons, Nelson & Simonsohn, 2012; retrieved from http://ssrn.com/abstract=2160588) -->
+```{r, echo=FALSE, message=FALSE}
+# Creating tables
+df_retest %>%
+  kbl(caption = "Table 3. Test-Retest", digits = 2) %>%
+  kable_classic(full_width = F, html_font = "Times")
+```
+
+
+
+```{r, echo=FALSE, message=FALSE}
+# Creating tables
+df_spearman2 %>%
+  kbl(caption = "Table 4. Spearman correlations", digits = 2) %>%
+  kable_classic(full_width = F, html_font = "Times")
+```
+
+
 
 ## Participants
 
@@ -101,7 +179,6 @@ We report how we determined our sample size, all data exclusions (if any), all m
 
 ## Data analysis
 We used `r cite_r("r-references.bib")` for all our analyses.
-
 
 # Results
 

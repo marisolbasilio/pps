@@ -18,3 +18,6 @@ library(ggplot2)
 library(here)
 library(dplyr)
 library(readxl)
+
+
+Users/mb773/Library/TinyTeX/texmf-var/web2c/tlmgr.log
